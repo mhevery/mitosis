@@ -35,7 +35,7 @@ describe('qwik', () => {
       const json = parseJsx(todo);
       const fileSet = createFileSet({ output: 'ts' });
       addComponent(fileSet, json);
-      debugOutput(fileSet);
+      await debugOutput(fileSet);
       expect(toObj(fileSet)).toMatchSnapshot();
     });
 
@@ -43,7 +43,7 @@ describe('qwik', () => {
       const json = parseJsx(todo);
       const fileSet = createFileSet({ output: 'cjs', jsx: false });
       addComponent(fileSet, json);
-      debugOutput(fileSet);
+      await debugOutput(fileSet);
       expect(toObj(fileSet)).toMatchSnapshot();
     });
 
@@ -55,7 +55,7 @@ describe('qwik', () => {
         jsx: false,
       });
       addComponent(fileSet, json);
-      debugOutput(fileSet);
+      await debugOutput(fileSet);
       expect(toObj(fileSet)).toMatchSnapshot();
     });
   });
@@ -65,7 +65,7 @@ describe('qwik', () => {
       const json = parseJsx(todos);
       const fileSet = createFileSet({ output: 'ts' });
       addComponent(fileSet, json);
-      debugOutput(fileSet);
+      await debugOutput(fileSet);
       expect(toObj(fileSet)).toMatchSnapshot();
     });
   });
@@ -78,7 +78,7 @@ describe('qwik', () => {
       const fileSet = createFileSet({ output: 'mjs' });
 
       addComponent(fileSet, component);
-      debugOutput(fileSet);
+      await debugOutput(fileSet);
       expect(toObj(fileSet)).toMatchSnapshot();
     });
   });
@@ -90,7 +90,7 @@ describe('qwik', () => {
     const fileSet = createFileSet({ output: 'mjs', jsx: false });
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
@@ -101,7 +101,7 @@ describe('qwik', () => {
     const fileSet = createFileSet({ output: 'mjs', jsx: false });
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
@@ -116,7 +116,7 @@ describe('qwik', () => {
     const fileSet = createFileSet({ output: 'mjs', jsx: false });
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
@@ -131,7 +131,7 @@ describe('qwik', () => {
     const fileSet = createFileSet({ output: 'mjs', jsx: false });
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
@@ -146,7 +146,7 @@ describe('qwik', () => {
     const fileSet = createFileSet({ output: 'mjs', jsx: false });
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
@@ -162,7 +162,7 @@ describe('qwik', () => {
     const fileSet = createFileSet({ output: 'mjs', jsx: true });
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
@@ -178,7 +178,7 @@ describe('qwik', () => {
     const fileSet = createFileSet({ output: 'mjs', jsx: true });
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
@@ -207,12 +207,41 @@ describe('qwik', () => {
       compileAwayBuilderComponentsFromTree(component, compileAwayComponents);
 
       addComponent(fileSet, component);
-      debugOutput(fileSet);
+      await debugOutput(fileSet);
+      expect(toObj(fileSet)).toMatchSnapshot();
+    });
+    test('component inputs', async () => {
+      const content = require('./qwik.test.component-inputs.json');
+      const state: Record<string, any> = {};
+      expect(state).toMatchSnapshot();
+      const fileSet = createFileSet({ output: 'cjs', jsx: true });
+      const component = builderContentToMitosisComponent(content, {
+        includeBuilderExtras: true,
+        preserveTextBlocks: true,
+      });
+
+      addComponent(fileSet, component);
+      await debugOutput(fileSet);
       expect(toObj(fileSet)).toMatchSnapshot();
     });
   });
 
-  test('bindings', () => {
+  test('show-hide', async () => {
+    const content = require('./qwik.test.show-hide.json');
+    const state: Record<string, any> = {};
+    expect(state).toMatchSnapshot();
+    const fileSet = createFileSet({ output: 'mjs', jsx: true });
+    const component = builderContentToMitosisComponent(content, {
+      includeBuilderExtras: true,
+      preserveTextBlocks: true,
+    });
+
+    addComponent(fileSet, component);
+    await debugOutput(fileSet);
+    expect(toObj(fileSet)).toMatchSnapshot();
+  });
+
+  test('bindings', async () => {
     // https://builder.io/content/5d5a2d612df542978577d83c0aefad1e
     // https://cdn.builder.io/api/v2/content/page/5d5a2d612df542978577d83c0aefad1e?apiKey=23dfd7cef1104af59f281d58ec525923
     const content = require('./qwik.test.bindings.json');
@@ -226,22 +255,7 @@ describe('qwik', () => {
     compileAwayBuilderComponentsFromTree(component, compileAwayComponents);
 
     addComponent(fileSet, component);
-    debugOutput(fileSet);
-    expect(toObj(fileSet)).toMatchSnapshot();
-  });
-
-  test('component inputs', () => {
-    const content = require('./qwik.test.component-inputs.json');
-    const state: Record<string, any> = {};
-    expect(state).toMatchSnapshot();
-    const fileSet = createFileSet({ output: 'cjs', jsx: true });
-    const component = builderContentToMitosisComponent(content, {
-      includeBuilderExtras: true,
-      preserveTextBlocks: true,
-    });
-
-    addComponent(fileSet, component);
-    debugOutput(fileSet);
+    await debugOutput(fileSet);
     expect(toObj(fileSet)).toMatchSnapshot();
   });
 
