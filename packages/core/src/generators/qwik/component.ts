@@ -1,3 +1,4 @@
+import { createMitosisNode } from '../../helpers/create-mitosis-node';
 import {
   compileAwayBuilderComponentsFromTree,
   components as compileAwayComponents,
@@ -69,9 +70,9 @@ function getCommonStyles(fileSet: FileSet): {
 export function addComponent(
   fileSet: FileSet,
   component: MitosisComponent,
-  opts: { isRoot?: boolean; shareStyles?: boolean } = {},
+  opts: { isRoot?: boolean; shareStyles?: boolean; hostProps?: Record<string, string> } = {},
 ) {
-  const _opts = { isRoot: false, shareStyles: false, ...opts };
+  const _opts = { isRoot: false, shareStyles: false, hostProps: null, ...opts };
   compileAwayBuilderComponentsFromTree(component, {
     ...compileAwayComponents,
     Image: undefined!,
@@ -105,12 +106,22 @@ export function addComponent(
     }
   }
   const directives: Map<string, string> = new Map();
+  let rootChildren = component.children;
+  if (_opts.hostProps) {
+    rootChildren = [
+      createMitosisNode({
+        name: 'Host',
+        properties: _opts.hostProps,
+        children: component.children,
+      }),
+    ];
+  }
   addComponentOnMount(
     onRenderFile,
     function (this: SrcBuilder) {
       return this.emit(
         'return ',
-        renderJSXNodes(onRenderFile, directives, handlers, component.children, styles, {}),
+        renderJSXNodes(onRenderFile, directives, handlers, rootChildren, styles, {}),
         ';',
       );
     },
@@ -190,7 +201,7 @@ function addComponentOnMount(
           'state.__INIT__=true;',
           ...inputInitializer,
           'typeof __STATE__==="object"&&Object.assign(state,__STATE__[state.serverStateId]);',
-          iif(component.hooks.onMount?.code),
+          ...(component.hooks.onMount?.code ? [iif(component.hooks.onMount?.code)] : []),
           '}',
           useStyles,
           onRenderEmit,

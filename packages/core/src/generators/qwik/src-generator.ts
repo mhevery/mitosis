@@ -62,17 +62,27 @@ export class File {
     });
     let source = srcImports.toString() + this.src.toString();
     if (this.options.isPretty) {
-      source = format(source, {
-        parser: 'typescript',
-        plugins: [
-          // To support running in browsers
-          require('prettier/parser-typescript'),
-          require('prettier/parser-postcss'),
-          require('prettier/parser-html'),
-          require('prettier/parser-babel'),
-        ],
-        htmlWhitespaceSensitivity: 'ignore',
-      });
+      try {
+        source = format(source, {
+          parser: 'typescript',
+          plugins: [
+            // To support running in browsers
+            require('prettier/parser-typescript'),
+            require('prettier/parser-postcss'),
+            require('prettier/parser-html'),
+            require('prettier/parser-babel'),
+          ],
+          htmlWhitespaceSensitivity: 'ignore',
+        });
+      } catch (e) {
+        throw new Error(
+          e +
+            '\n' +
+            '========================================================================\n' +
+            source +
+            '\n\n========================================================================',
+        );
+      }
     }
     return source;
   }
@@ -156,6 +166,7 @@ export class SrcBuilder {
       value.startsWith(':') ||
       value.startsWith(']') ||
       value.startsWith('}') ||
+      value.startsWith(',') ||
       value.startsWith('?')
     ) {
       // clear last ',' or ';';
@@ -346,7 +357,6 @@ function ignoreKey(key: string): boolean {
     key.startsWith('_') ||
     key == 'code' ||
     key == '' ||
-    key == 'builder-id' ||
     key.indexOf('.') !== -1
   );
 }
